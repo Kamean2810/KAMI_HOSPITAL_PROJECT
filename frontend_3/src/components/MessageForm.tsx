@@ -3,6 +3,9 @@ import type { FormEvent } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+interface MessageResponse {
+  message: string;
+}
 
 const MessageForm: React.FC = () => {
   const [firstName, setFirstName] = useState<string>("");
@@ -14,7 +17,7 @@ const MessageForm: React.FC = () => {
   const handleMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
+      const { data } = await axios.post<MessageResponse>(
         "http://localhost:4000/api/v1/message/send",
         { firstName, lastName, email, phone, message },
         {
@@ -22,14 +25,16 @@ const MessageForm: React.FC = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
-      toast.success(res.data.message);
+
+      toast.success(data.message);
+
+      // Reset form
       setFirstName("");
       setLastName("");
       setEmail("");
       setPhone("");
       setMessage("");
     } catch (error: any) {
-      // Defensive error handling
       const errorMsg =
         error.response?.data?.message || "Something went wrong.";
       toast.error(errorMsg);
@@ -40,6 +45,7 @@ const MessageForm: React.FC = () => {
     <div className="container mx-auto p-6 max-w-3xl bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-6 text-center">Send Us A Message</h2>
       <form onSubmit={handleMessage} className="space-y-6">
+        {/* First & Last Name */}
         <div className="flex gap-4">
           <input
             type="text"
@@ -54,12 +60,13 @@ const MessageForm: React.FC = () => {
             placeholder="Last Name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="flex-1 border border-gray-300 rounded-md px-4 py-7 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <div className="flex gap-8">
+        {/* Email & Phone */}
+        <div className="flex gap-4">
           <input
             type="email"
             placeholder="Email"
@@ -78,6 +85,7 @@ const MessageForm: React.FC = () => {
           />
         </div>
 
+        {/* Message */}
         <textarea
           rows={7}
           placeholder="Message"

@@ -9,6 +9,14 @@ interface Doctor {
   doctorDepartment: string;
 }
 
+interface DoctorsResponse {
+  doctors: Doctor[];
+}
+
+interface AppointmentResponse {
+  message: string;
+}
+
 const departmentsArray = [
   "Pediatrics",
   "Orthopedics",
@@ -41,11 +49,12 @@ const AppointmentForm: React.FC = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const { data } = await axios.get("http://localhost:4000/api/v1/user/doctor/addnew", {
-          withCredentials: true,
-        });
+        const { data } = await axios.get<DoctorsResponse>(
+          "http://localhost:4000/api/v1/user/doctor/addnew",
+          { withCredentials: true }
+        );
         setDoctors(data.doctors);
-      } catch (error) {
+      } catch {
         toast.error("Failed to load doctors");
       }
     };
@@ -55,7 +64,7 @@ const AppointmentForm: React.FC = () => {
   const handleAppointment = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(
+      const { data } = await axios.post<AppointmentResponse>(
         "http://localhost:4000/api/v1/appointment/post",
         {
           firstName,
@@ -77,7 +86,9 @@ const AppointmentForm: React.FC = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
+
       toast.success(data.message);
+
       // Reset form
       setFirstName("");
       setLastName("");
@@ -101,6 +112,7 @@ const AppointmentForm: React.FC = () => {
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-3xl font-semibold mb-6 text-center">Book an Appointment</h2>
       <form onSubmit={handleAppointment} className="space-y-6">
+        {/* First & Last Name */}
         <div className="flex gap-4">
           <input
             type="text"
@@ -120,6 +132,7 @@ const AppointmentForm: React.FC = () => {
           />
         </div>
 
+        {/* Email & Phone */}
         <div className="flex gap-4">
           <input
             type="email"
@@ -139,6 +152,7 @@ const AppointmentForm: React.FC = () => {
           />
         </div>
 
+        {/* NIC & DOB */}
         <div className="flex gap-4">
           <input
             type="text"
@@ -156,6 +170,7 @@ const AppointmentForm: React.FC = () => {
           />
         </div>
 
+        {/* Gender & Appointment Date */}
         <div className="flex gap-4">
           <select
             value={gender}
@@ -178,6 +193,7 @@ const AppointmentForm: React.FC = () => {
           />
         </div>
 
+        {/* Department & Doctor */}
         <div className="flex gap-4">
           <select
             value={department}
@@ -221,6 +237,7 @@ const AppointmentForm: React.FC = () => {
           </select>
         </div>
 
+        {/* Address */}
         <textarea
           rows={5}
           placeholder="Address"
@@ -229,6 +246,7 @@ const AppointmentForm: React.FC = () => {
           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
+        {/* Checkbox */}
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
